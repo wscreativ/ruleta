@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEGGANCE — Roata Norocului</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<style>
+  /* =========================================================
+     LEGGANCE — Roata Norocului
+     Paletă: plum profund + roz-nud + auriu cald pe fundal cald
+  ========================================================= */
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&display=swap');
+
+  :root{
+    --plum:#3a1f36;
+    --plum-2:#582a4e;
+    --nude:#f3e3df;
+    --nude-2:#e8cfc9;
+    --rose:#c76b7a;
+    --gold:#c9a24b;
+    --ink:#2a1826;
+    --cream:#fbf6f3;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Manrope',sans-serif;
+    background:radial-gradient(120% 120% at 50% 0%,var(--nude) 0%,var(--cream) 55%);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+  }
+  .stage{width:100%;max-width:440px;text-align:center}
+
+  .eyebrow{
+    font-size:12px;letter-spacing:.32em;text-transform:uppercase;
+    color:var(--rose);font-weight:700;margin-bottom:6px;
+  }
+  h1{
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:clamp(28px,7vw,40px);line-height:1;color:var(--plum);
+    margin-bottom:6px;
+  }
+  .sub{font-size:14px;color:#7a5a6e;margin-bottom:22px}
+
+  /* --- Roata --- */
+  .wheel-wrap{position:relative;width:min(340px,86vw);aspect-ratio:1;margin:0 auto 8px}
+  .pointer{
+    position:absolute;top:-6px;left:50%;transform:translateX(-50%);
+    width:0;height:0;z-index:6;
+    border-left:16px solid transparent;border-right:16px solid transparent;
+    border-top:26px solid var(--plum);
+    filter:drop-shadow(0 3px 4px rgba(58,31,54,.35));
+  }
+  .wheel{
+    width:100%;height:100%;border-radius:50%;
+    border:10px solid var(--plum);
+    box-shadow:0 20px 40px -12px rgba(58,31,54,.45),inset 0 0 0 4px var(--gold);
+    transition:transform 5s cubic-bezier(.14,.72,.11,1);
+    position:relative;
+  }
+  .hub{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:58px;height:58px;border-radius:50%;z-index:5;
+    background:radial-gradient(circle at 35% 30%,#fff,var(--nude-2));
+    border:3px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-style:italic;color:var(--plum);
+    font-size:20px;box-shadow:0 4px 10px rgba(58,31,54,.3);
+  }
+
+  /* --- Butoane --- */
+  .btn{
+    font-family:'Manrope';font-weight:700;font-size:15px;cursor:pointer;
+    border:none;border-radius:100px;padding:15px 30px;letter-spacing:.02em;
+    transition:transform .15s ease,box-shadow .15s ease,opacity .2s;
+  }
+  .btn:active{transform:scale(.97)}
+  .btn-primary{
+    background:linear-gradient(135deg,var(--plum-2),var(--plum));
+    color:var(--nude);box-shadow:0 10px 22px -8px rgba(58,31,54,.6);
+  }
+  .btn-ghost{background:transparent;color:var(--plum);border:2px solid var(--plum)}
+  .btn[disabled]{opacity:.4;cursor:not-allowed;transform:none}
+
+  .spins{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#9a7c8d;margin:14px 0 4px;font-weight:600}
+  .controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+
+  /* --- Rezultat --- */
+  .result{
+    margin-top:20px;background:#fff;border-radius:22px;padding:26px 22px;
+    box-shadow:0 18px 40px -16px rgba(58,31,54,.35);
+    border:1px solid var(--nude-2);
+    display:none;animation:pop .45s cubic-bezier(.2,1.2,.3,1);
+  }
+  @keyframes pop{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+  .result .prize{
+    font-family:'Fraunces',serif;font-size:44px;color:var(--rose);
+    line-height:1;margin-bottom:4px;font-weight:600;
+  }
+  .result .prize.gold{color:var(--gold)}
+  .result .rtitle{font-family:'Fraunces',serif;font-size:22px;color:var(--plum);margin-bottom:10px}
+  .result .rtext{font-size:15px;line-height:1.55;color:#5c4453;margin-bottom:18px}
+  .result .code{
+    display:inline-block;font-weight:700;letter-spacing:.14em;
+    background:var(--nude);color:var(--plum);padding:10px 20px;border-radius:10px;
+    border:1px dashed var(--rose);font-size:15px;transition:all .3s;
+  }
+  .result .code.masked{opacity:.55;filter:blur(.4px)}
+  .result .code.revealed{
+    background:var(--plum);color:var(--gold);border:1px solid var(--gold);
+    animation:pop .4s cubic-bezier(.2,1.2,.3,1);letter-spacing:.2em;
+  }
+  .copy-btn{
+    display:none;margin:12px auto 0;font-size:12px;font-weight:600;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--rose);
+    background:none;border:none;cursor:pointer;text-decoration:underline;
+  }
+  .footnote{font-size:11px;color:#a892a0;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="eyebrow">Leggance · exclusiv online</div>
+  <h1>Roata Norocului</h1>
+  <p class="sub">Ai 3 rotiri. Păstrează premiul sau riscă pentru mai mult.</p>
+
+  <div class="wheel-wrap">
+    <div class="pointer"></div>
+    <canvas class="wheel" id="wheel" width="600" height="600"></canvas>
+    <div class="hub">L</div>
+  </div>
+
+  <p class="spins">Rotire <span id="spinNum">1</span> din 3</p>
+  <div class="controls">
+    <button class="btn btn-primary" id="spinBtn">Învârte roata</button>
+  </div>
+
+  <div class="result" id="result">
+    <div class="prize" id="rPrize">40%</div>
+    <div class="rtitle" id="rTitle"></div>
+    <div class="rtext" id="rText"></div>
+    <div class="code masked" id="rCode">Cod: XXXXX</div>
+    <button class="copy-btn" id="copyBtn">Copiază codul</button>
+    <div class="controls" id="chooseControls" style="margin-top:18px">
+      <button class="btn btn-primary" id="keepBtn">Vreau acest premiu</button>
+      <button class="btn btn-ghost" id="againBtn">Mai învârt o dată</button>
+    </div>
+    <p class="footnote" id="rFoot"></p>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   EDITEAZĂ AICI — segmentele de pe roată + textele per câștig
+   ---------------------------------------------------------
+   Ordinea din "segments" = ordinea pe roată (în sens orar).
+   Fiecare "message" e afișat separat când roata se oprește pe el.
+========================================================= */
+const CONFIG = {
+  segments: [
+    { label:"10%", value:10, color:"#582a4e" },
+    { label:"15%", value:15, color:"#c76b7a" },
+    { label:"35%", value:35, color:"#3a1f36" },
+    { label:"30%", value:30, color:"#a84f60" },
+    { label:"40%", value:40, color:"#c9a24b" }, // premiul mare
+    { label:"15%", value:15, color:"#c76b7a" }
+  ],
+
+  // Textele afișate pentru fiecare procent. Editează liber.
+  messages: {
+    10: {
+      title:"Ai prins 10% reducere",
+      text:"Se aplică la întreaga colecție de leggings și seturi. Un start bun pentru garderoba ta de antrenament.",
+      code:"LEG10"
+    },
+    15: {
+      title:"Ai prins 15% reducere",
+      text:"Valabil pe toate produsele Leggance. Perfect pentru a-ți completa setul preferat.",
+      code:"LEG15"
+    },
+    30: {
+      title:"Ai prins 30% reducere",
+      text:"Se aplică la sportbra + leggings cumpărate împreună. Combinația care nu te lasă la sală.",
+      code:"LEG30"
+    },
+    35: {
+      title:"Ai prins 35% reducere",
+      text:"Reducere mare pe seturile complete. Ai grijă — la a 3-a rotire poate ieși ceva și mai bun.",
+      code:"LEG35"
+    },
+    40: {
+      title:"Premiul cel mare — 40% reducere!",
+      text:"Se aplică pe produsele din colecția X (leggings seamless + seturi premium). Este cea mai mare reducere pe care o oferim. Nu o rata.",
+      code:"LEG40"
+    }
+  },
+
+  // Ce iese la fiecare rotire. Rotirile 1-2 = reduceri mici (aleatoriu din listă),
+  // rotirea 3 = mereu 40%.
+  forcedByRound: {
+    1: [10,15,30,35],   // aleatoriu din acestea
+    2: [10,15,30,35],
+    3: [40]             // garantat 40%
+  }
+};
+/* ===== gata de editat ===== */
+
+const seg = CONFIG.segments;
+const N = seg.length;
+const arc = 360 / N;
+
+/* ---- desenăm roata pe canvas ---- */
+const cv = document.getElementById('wheel');
+const ctx = cv.getContext('2d');
+const R = cv.width/2;
+function draw(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  for(let i=0;i<N;i++){
+    const start=(i*arc-90)*Math.PI/180;
+    const end=((i+1)*arc-90)*Math.PI/180;
+    ctx.beginPath();ctx.moveTo(R,R);
+    ctx.arc(R,R,R-4,start,end);ctx.closePath();
+    ctx.fillStyle=seg[i].color;ctx.fill();
+    // text
+    ctx.save();ctx.translate(R,R);
+    ctx.rotate((i+0.5)*arc*Math.PI/180-Math.PI/2);
+    ctx.textAlign="right";ctx.fillStyle="#fbf6f3";
+    ctx.font="600 40px Manrope, sans-serif";
+    ctx.fillText(seg[i].label,R-38,14);
+    ctx.restore();
+  }
+}
+draw();
+
+/* ---- logica rotirilor ---- */
+let round=1, currentRotation=0, spinning=false;
+
+function pick(round){
+  const pool=CONFIG.forcedByRound[round];
+  const val=pool[Math.floor(Math.random()*pool.length)];
+  // găsim un index de segment care are această valoare
+  const idxs=seg.map((s,i)=>s.value===val?i:-1).filter(i=>i>=0);
+  return idxs[Math.floor(Math.random()*idxs.length)];
+}
+
+function spin(){
+  if(spinning) return;
+  spinning=true;
+  $('#spinBtn').prop('disabled',true);
+  $('#result').hide();
+
+  const target=pick(round);
+  // centrul feliei target (0 = sus, în sens orar)
+  const segCenter=target*arc+arc/2;
+  // unghiul absolut la care roata trebuie să ajungă ca felia target să fie sub pointer
+  const targetAngle=(360-segCenter)%360;
+  // poziția curentă normalizată
+  const currentMod=((currentRotation%360)+360)%360;
+  // cât mai avem de rotit ca să ajungem la targetAngle, + ture complete
+  let delta=(targetAngle-currentMod+360)%360;
+  const spins=5;
+  currentRotation+=spins*360+delta;
+
+  $('#wheel').css('transform',`rotate(${currentRotation}deg)`);
+
+  setTimeout(()=>{
+    spinning=false;
+    show(seg[target].value);
+  },5100);
+}
+
+let currentValue=null; // valoarea afișată acum (pentru confirmare)
+
+function show(value){
+  currentValue=value;
+  const m=CONFIG.messages[value];
+  $('#rPrize').text(value+'%').toggleClass('gold',value===40);
+  $('#rTitle').text(m.title);
+  $('#rText').text(m.text);
+  // cod MASCAT până confirmă
+  $('#rCode').removeClass('revealed').addClass('masked').text('Cod: XXXXX');
+  $('#copyBtn').hide();
+  $('#chooseControls').show();
+
+  if(round>=3){
+    $('#againBtn').hide();
+    $('#keepBtn').text('Vreau acest premiu');
+    $('#rFoot').text('Aceasta a fost ultima rotire.');
+  }else{
+    $('#againBtn').show();
+    $('#keepBtn').text('Vreau acest premiu');
+    $('#rFoot').text('Dacă mai învârți, premiul curent se pierde.');
+  }
+  $('#result').fadeIn(250);
+}
+
+function reveal(value){
+  const m=CONFIG.messages[value];
+  $('#rCode').removeClass('masked').addClass('revealed').text('Cod: '+m.code);
+  $('#copyBtn').show().data('code',m.code);
+  $('#chooseControls').hide();
+  $('#rFoot').text('Premiu confirmat 🎉 Aplică codul la finalizarea comenzii.');
+  $('#spinBtn').hide();
+  saveWin(value,m.code);
+}
+
+/* ---- cookie de blocare (durată reglabilă mai jos) ---- */
+const COOKIE_NAME='leggance_ruleta';
+const COOKIE_DAYS=30;
+function setCookie(v){
+  const d=new Date();d.setTime(d.getTime()+COOKIE_DAYS*864e5);
+  document.cookie=`${COOKIE_NAME}=${encodeURIComponent(v)};expires=${d.toUTCString()};path=/;SameSite=Lax`;
+}
+function getCookie(){
+  const m=document.cookie.match(new RegExp('(^| )'+COOKIE_NAME+'=([^;]+)'));
+  return m?decodeURIComponent(m[2]):null;
+}
+function saveWin(value,code){ setCookie(value+'|'+code); }
+
+/* dacă a mai jucat, arată direct premiul câștigat */
+function checkExisting(){
+  const saved=getCookie();
+  if(!saved) return false;
+  const [value,code]=saved.split('|');
+  const m=CONFIG.messages[value];
+  if(!m) return false;
+  $('.spins,#spinBtn').hide();
+  $('#rPrize').text(value+'%').toggleClass('gold',+value===40);
+  $('#rTitle').text('Ai câștigat deja');
+  $('#rText').text(m.text);
+  $('#rCode').removeClass('masked').addClass('revealed').text('Cod: '+code);
+  $('#copyBtn').show().data('code',code);
+  $('#chooseControls').hide();
+  $('#rFoot').text('Acesta este codul tău. Aplică-l la finalizarea comenzii.');
+  $('#result').show();
+  return true;
+}
+
+$('#spinBtn').on('click',spin);
+
+$('#againBtn').on('click',function(){
+  round++;
+  $('#spinNum').text(round);
+  $('#result').hide();
+  $('#spinBtn').prop('disabled',false).show();
+  $('html,body').animate({scrollTop:0},300);
+});
+
+$('#keepBtn').on('click',function(){
+  reveal(currentValue);
+});
+
+$('#copyBtn').on('click',function(){
+  const code=$(this).data('code');
+  navigator.clipboard?.writeText(code);
+  const t=$(this);t.text('Copiat ✓');setTimeout(()=>t.text('Copiază codul'),1600);
+});
+
+/* la încărcare: dacă a jucat deja, sări peste roată */
+checkExisting();
+</script>
+</body>
+</html>
