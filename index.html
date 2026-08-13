@@ -360,6 +360,26 @@ $('#copyBtn').on('click',function(){
 
 /* la încărcare: dacă a jucat deja, sări peste roată */
 checkExisting();
+
+/* =========================================================
+   AUTO-HEIGHT PENTRU IFRAME
+   ---------------------------------------------------------
+   Trimite înălțimea reală a paginii către fereastra părinte
+   (pagina care embed-uiește ruleta într-un <iframe>), ca
+   host-ul să poată redimensiona iframe-ul exact la conținut
+   — fără scroll intern, inclusiv când apare mesajul de câștig.
+========================================================= */
+(function(){
+  if(window.parent===window) return; // nu rulează în iframe, nu face nimic
+  function postHeight(){
+    const h=document.documentElement.scrollHeight;
+    window.parent.postMessage({type:'leggance-ruleta-height',height:h},'*');
+  }
+  window.addEventListener('load',postHeight);
+  window.addEventListener('resize',postHeight);
+  new ResizeObserver(postHeight).observe(document.body);
+  postHeight();
+})();
 </script>
 </body>
 </html>
