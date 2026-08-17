@@ -295,17 +295,25 @@ function reveal(value){
   saveWin(value,m.code);
 }
 
-const COOKIE_NAME='leggance_ruleta';
-const COOKIE_DAYS=1;
+const STORE_KEY='leggance_ruleta';
+const STORE_HOURS=24;   // revino peste 24 ore
 function setCookie(v){
-  const d=new Date();d.setTime(d.getTime()+COOKIE_DAYS*864e5);
-  document.cookie=`${COOKIE_NAME}=${encodeURIComponent(v)};expires=${d.toUTCString()};path=/;SameSite=Lax`;
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify({v:v, exp:Date.now()+STORE_HOURS*3600e3}));
+  }catch(e){}
 }
 function getCookie(){
-  const m=document.cookie.match(new RegExp('(^| )'+COOKIE_NAME+'=([^;]+)'));
-  return m?decodeURIComponent(m[2]):null;
+  try{
+    const raw=localStorage.getItem(STORE_KEY);
+    if(!raw) return null;
+    const o=JSON.parse(raw);
+    if(Date.now()>o.exp){ localStorage.removeItem(STORE_KEY); return null; }
+    return o.v;
+  }catch(e){ return null; }
 }
 function saveWin(value,code){ setCookie(value+'|'+code); }
+
+  
 
 function checkExisting(){
   const saved=getCookie();
