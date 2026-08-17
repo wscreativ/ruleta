@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ro">
 <head>
@@ -6,10 +7,6 @@
 <title>LEGGANCE — Voucherul tău exclusiv</title>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <style>
-  /* =========================================================
-     LEGGANCE — Roata Norocului
-     Paletă: plum profund + roz-nud + auriu cald pe fundal cald
-  ========================================================= */
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&display=swap');
 
   :root{
@@ -46,7 +43,6 @@
   }
   .sub{font-size:14px;color:#7a5a6e;margin-bottom:22px}
 
-  /* --- Roata --- */
   .wheel-wrap{position:relative;width:min(340px,86vw);aspect-ratio:1;margin:0 auto 8px}
   .pointer{
     position:absolute;top:-6px;left:50%;transform:translateX(-50%);
@@ -77,7 +73,6 @@
     object-fit:contain;
   }
 
-  /* --- Butoane --- */
   .btn{
     font-family:'Manrope';font-weight:700;font-size:15px;cursor:pointer;
     border:none;border-radius:100px;padding:15px 30px;letter-spacing:.02em;
@@ -94,7 +89,6 @@
   .spins{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#9a7c8d;margin:14px 0 4px;font-weight:600}
   .controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:6px}
 
-  /* --- Rezultat --- */
   .result{
     margin-top:20px;background:#fff;border-radius:22px;padding:26px 22px;
     box-shadow:0 18px 40px -16px rgba(58,31,54,.35);
@@ -161,23 +155,16 @@
 </div>
 
 <script>
-/* =========================================================
-   EDITEAZĂ AICI — segmentele de pe roată + textele per câștig
-   ---------------------------------------------------------
-   Ordinea din "segments" = ordinea pe roată (în sens orar).
-   Fiecare "message" e afișat separat când roata se oprește pe el.
-========================================================= */
 const CONFIG = {
   segments: [
-    { label:"10%", value:10, color:"#582a4e" },
-    { label:"20%", value:20, color:"#c76b7a" },
-    { label:"35%", value:35, color:"#3a1f36" },
-    { label:"50Lei", value:30, color:"#a84f60" },
-    { label:"40%", value:40, color:"#c9a24b" }, // premiul mare
-    { label:"15%", value:15, color:"#c76b7a" }
+    { label:"10%",   value:10, display:"10%",     color:"#582a4e" },
+    { label:"20%",   value:20, display:"20%",     color:"#c76b7a" },
+    { label:"35%",   value:35, display:"35%",     color:"#3a1f36" },
+    { label:"50Lei", value:50, display:"-50 Lei", color:"#a84f60" },
+    { label:"40%",   value:40, display:"40%",     color:"#c9a24b" },
+    { label:"20%",   value:20, display:"20%",     color:"#c76b7a" }
   ],
 
-  // Textele afișate pentru fiecare procent. Editează liber.
   messages: {
     10: {
       title:"Ai prins 10% reducere",
@@ -186,41 +173,39 @@ const CONFIG = {
     },
     20: {
       title:"Ai prins 20% reducere",
-      text:"Valabil pe toate produsele Leggance , excluzand Accesoriile si Bundles. Perfect pentru a-ți completa setul preferat.",
+      text:"Valabil pe toate produsele Leggance, excluzând Accesoriile și Bundles. Perfect pentru a-ți completa setul preferat.",
       code:"LGN20"
     },
-    30: {
+    50: {
       title:"Ai prins -50 Lei reducere",
-      text:"Adauga in cos de minim 300 lei si ai -50Lei Discount.  <br />Ai grijă — la urmatoarea rotire poate ieși ceva și mai bun.",
+      text:"Adaugă în coș de minim 300 lei și primești -50 Lei discount.<br />Ai grijă — la următoarea rotire poate ieși ceva și mai bun.",
       code:"50LEI"
     },
     35: {
       title:"Ai prins 35% reducere",
-      text:"Reducere mare ! Ai 35% reducere pentru produsul : <b><a href='https://www.leggance.ro/cumpara/colanti-soft-skin-v-shaped-waist-coffee-2891'>Colanti Soft-Skin V-Shaped Waist, Coffee</a> </b> .<br /> Ai grijă — la a 3-a rotire poate ieși ceva și mai bun.",
+      text:"Reducere mare! Ai 35% reducere pentru produsul: <b><a href='https://www.leggance.ro/cumpara/colanti-soft-skin-v-shaped-waist-coffee-2891'>Colanți Soft-Skin V-Shaped Waist, Coffee</a></b>.<br />Ai grijă — la a 3-a rotire poate ieși ceva și mai bun.",
       code:"SHAPED35"
     },
     40: {
       title:"WOW! Premiul cel mare — 40% reducere!",
-      text:"Se aplică pe produsele din colecția-40% EXCLUSIV . Este cea mai mare reducere pe care o oferim. Nu o rata. <br /> -40% >>> <a href='https://www.leggance.ro/catalog/exclusiv-40-301'VEZI AICI PRODUSELE</a>",
+      text:"Se aplică pe produsele din colecția EXCLUSIV -40%. Este cea mai mare reducere pe care o oferim. Nu o rata.<br />-40% >>> <a href='https://www.leggance.ro/catalog/exclusiv-40-301'>VEZI AICI PRODUSELE</a>",
       code:"WOW40"
     }
   },
 
-  // Ce iese la fiecare rotire. Rotirile 1-2 = reduceri mici (aleatoriu din listă),
-  // rotirea 3 = mereu 40%.
   forcedByRound: {
-    1: [10,15,30,35],   // aleatoriu din acestea
-    2: [10,15,30,35],
-    3: [40]             // garantat 40%
+    1: [10,20,50,35],
+    2: [10,20,50,35],
+    3: [40]
   }
 };
-/* ===== gata de editat ===== */
 
 const seg = CONFIG.segments;
 const N = seg.length;
 const arc = 360 / N;
 
-/* ---- desenăm roata pe canvas ---- */
+function segByValue(value){ return seg.find(s=>s.value===value) || {display:value+'%'}; }
+
 const cv = document.getElementById('wheel');
 const ctx = cv.getContext('2d');
 const R = cv.width/2;
@@ -232,7 +217,6 @@ function draw(){
     ctx.beginPath();ctx.moveTo(R,R);
     ctx.arc(R,R,R-4,start,end);ctx.closePath();
     ctx.fillStyle=seg[i].color;ctx.fill();
-    // text
     ctx.save();ctx.translate(R,R);
     ctx.rotate((i+0.5)*arc*Math.PI/180-Math.PI/2);
     ctx.textAlign="right";ctx.fillStyle="#fbf6f3";
@@ -243,13 +227,11 @@ function draw(){
 }
 draw();
 
-/* ---- logica rotirilor ---- */
 let round=1, currentRotation=0, spinning=false;
 
 function pick(round){
   const pool=CONFIG.forcedByRound[round];
   const val=pool[Math.floor(Math.random()*pool.length)];
-  // găsim un index de segment care are această valoare
   const idxs=seg.map((s,i)=>s.value===val?i:-1).filter(i=>i>=0);
   return idxs[Math.floor(Math.random()*idxs.length)];
 }
@@ -257,19 +239,14 @@ function pick(round){
 function spin(){
   if(spinning) return;
   spinning=true;
-  // Blochează din PRIMA rotire — rezistă la refresh, chiar dacă nu confirmă premiul
   if(round===1){ setCookie('playing'); }
   $('#spinBtn').prop('disabled',true);
   $('#result').hide();
 
   const target=pick(round);
-  // centrul feliei target (0 = sus, în sens orar)
   const segCenter=target*arc+arc/2;
-  // unghiul absolut la care roata trebuie să ajungă ca felia target să fie sub pointer
   const targetAngle=(360-segCenter)%360;
-  // poziția curentă normalizată
   const currentMod=((currentRotation%360)+360)%360;
-  // cât mai avem de rotit ca să ajungem la targetAngle, + ture complete
   let delta=(targetAngle-currentMod+360)%360;
   const spins=5;
   currentRotation+=spins*360+delta;
@@ -282,15 +259,14 @@ function spin(){
   },5100);
 }
 
-let currentValue=null; // valoarea afișată acum (pentru confirmare)
+let currentValue=null;
 
 function show(value){
   currentValue=value;
   const m=CONFIG.messages[value];
-  $('#rPrize').text(value+'%').toggleClass('gold',value===40);
+  $('#rPrize').text(segByValue(value).display).toggleClass('gold',value===40);
   $('#rTitle').text(m.title);
   $('#rText').html(m.text);
-  // cod MASCAT până confirmă
   $('#rCode').removeClass('revealed').addClass('masked').text('Cod: XXXXX');
   $('#copyBtn').hide();
   $('#chooseControls').show();
@@ -317,9 +293,8 @@ function reveal(value){
   saveWin(value,m.code);
 }
 
-/* ---- cookie de blocare (24 ore) ---- */
 const COOKIE_NAME='leggance_ruleta';
-const COOKIE_DAYS=1;   // revino peste 24 ore
+const COOKIE_DAYS=1;
 function setCookie(v){
   const d=new Date();d.setTime(d.getTime()+COOKIE_DAYS*864e5);
   document.cookie=`${COOKIE_NAME}=${encodeURIComponent(v)};expires=${d.toUTCString()};path=/;SameSite=Lax`;
@@ -330,14 +305,12 @@ function getCookie(){
 }
 function saveWin(value,code){ setCookie(value+'|'+code); }
 
-/* dacă a mai jucat, arată direct premiul câștigat (sau blochează dacă n-a confirmat) */
 function checkExisting(){
   const saved=getCookie();
   if(!saved) return false;
   const [value,code]=saved.split('|');
   const m=CONFIG.messages[value];
 
-  // A început să joace dar NU a confirmat un premiu (cookie 'playing') → blochează fără cod
   if(!m){
     $('.spins,#spinBtn,.wheel-wrap').hide();
     $('#rPrize').text('');
@@ -351,9 +324,8 @@ function checkExisting(){
     return true;
   }
 
-  // A confirmat un premiu → arată codul câștigat
   $('.spins,#spinBtn').hide();
-  $('#rPrize').text(value+'%').toggleClass('gold',+value===40);
+  $('#rPrize').text(segByValue(+value).display).toggleClass('gold',+value===40);
   $('#rTitle').text('Ai câștigat deja');
   $('#rText').html(m.text);
   $('#rCode').removeClass('masked').addClass('revealed').text('Cod: '+code);
@@ -384,19 +356,10 @@ $('#copyBtn').on('click',function(){
   const t=$(this);t.text('Copiat ✓');setTimeout(()=>t.text('Copiază codul'),1600);
 });
 
-/* la încărcare: dacă a jucat deja, sări peste roată */
 checkExisting();
 
-/* =========================================================
-   AUTO-HEIGHT PENTRU IFRAME
-   ---------------------------------------------------------
-   Trimite înălțimea reală a paginii către fereastra părinte
-   (pagina care embed-uiește ruleta într-un <iframe>), ca
-   host-ul să poată redimensiona iframe-ul exact la conținut
-   — fără scroll intern, inclusiv când apare mesajul de câștig.
-========================================================= */
 (function(){
-  if(window.parent===window) return; // nu rulează în iframe, nu face nimic
+  if(window.parent===window) return;
   function postHeight(){
     const h=document.documentElement.scrollHeight;
     window.parent.postMessage({type:'leggance-ruleta-height',height:h},'*');
