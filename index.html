@@ -71,6 +71,11 @@
     font-family:'Fraunces',serif;font-style:italic;color:var(--plum);
     font-size:20px;box-shadow:0 4px 10px rgba(58,31,54,.3);
   }
+  .hub img{
+    width:70%;
+    height:70%;
+    object-fit:contain;
+  }
 
   /* --- Butoane --- */
   .btn{
@@ -104,6 +109,7 @@
   .result .prize.gold{color:var(--gold)}
   .result .rtitle{font-family:'Fraunces',serif;font-size:22px;color:var(--plum);margin-bottom:10px}
   .result .rtext{font-size:15px;line-height:1.55;color:#5c4453;margin-bottom:18px}
+  .result .rtext a{color:var(--gold);font-weight:700;text-decoration:underline}
   .result .code{
     display:inline-block;font-weight:700;letter-spacing:.14em;
     background:var(--nude);color:var(--plum);padding:10px 20px;border-radius:10px;
@@ -119,15 +125,7 @@
     letter-spacing:.1em;text-transform:uppercase;color:var(--rose);
     background:none;border:none;cursor:pointer;text-decoration:underline;
   }
-
-  .hub img{
-    width:70%;
-    height:70%;
-    object-fit:contain;
-}
   .footnote{font-size:11px;color:#a892a0;margin-top:14px}
-
-  .result .rtext a{color:var(--gold);font-weight:700;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -202,7 +200,7 @@ const CONFIG = {
     },
     40: {
       title:"Premiul cel mare — 40% reducere!",
-      text:"Se aplică pe produsele din colecția Vanity . Este cea mai mare reducere pe care o oferim. Nu o rata. <a href='https://www.leggance.ro/cumpara/colanti-vanity-2-0-navy-2903'> VANITYM</a>",
+      text:"Se aplică pe produsele din colecția Vanity. Este cea mai mare reducere pe care o oferim. Nu o rata. <a href='https://www.leggance.ro/cumpara/colanti-vanity-2-0-navy-2903'>VANITY</a>",
       code:"LEG40"
     }
   },
@@ -258,6 +256,8 @@ function pick(round){
 function spin(){
   if(spinning) return;
   spinning=true;
+  // Blochează din PRIMA rotire — rezistă la refresh, chiar dacă nu confirmă premiul
+  if(round===1){ setCookie('playing'); }
   $('#spinBtn').prop('disabled',true);
   $('#result').hide();
 
@@ -316,9 +316,9 @@ function reveal(value){
   saveWin(value,m.code);
 }
 
-/* ---- cookie de blocare (durată reglabilă mai jos) ---- */
+/* ---- cookie de blocare (24 ore) ---- */
 const COOKIE_NAME='leggance_ruleta';
-const COOKIE_DAYS=30;
+const COOKIE_DAYS=1;   // revino peste 24 ore
 function setCookie(v){
   const d=new Date();d.setTime(d.getTime()+COOKIE_DAYS*864e5);
   document.cookie=`${COOKIE_NAME}=${encodeURIComponent(v)};expires=${d.toUTCString()};path=/;SameSite=Lax`;
@@ -329,13 +329,28 @@ function getCookie(){
 }
 function saveWin(value,code){ setCookie(value+'|'+code); }
 
-/* dacă a mai jucat, arată direct premiul câștigat */
+/* dacă a mai jucat, arată direct premiul câștigat (sau blochează dacă n-a confirmat) */
 function checkExisting(){
   const saved=getCookie();
   if(!saved) return false;
   const [value,code]=saved.split('|');
   const m=CONFIG.messages[value];
-  if(!m) return false;
+
+  // A început să joace dar NU a confirmat un premiu (cookie 'playing') → blochează fără cod
+  if(!m){
+    $('.spins,#spinBtn,.wheel-wrap').hide();
+    $('#rPrize').text('');
+    $('#rTitle').text('Ai jucat deja');
+    $('#rText').html('Ai folosit deja rotirile. Revino peste 24 de ore pentru o nouă șansă.');
+    $('#rCode').hide();
+    $('#copyBtn').hide();
+    $('#chooseControls').hide();
+    $('#rFoot').text('');
+    $('#result').show();
+    return true;
+  }
+
+  // A confirmat un premiu → arată codul câștigat
   $('.spins,#spinBtn').hide();
   $('#rPrize').text(value+'%').toggleClass('gold',+value===40);
   $('#rTitle').text('Ai câștigat deja');
