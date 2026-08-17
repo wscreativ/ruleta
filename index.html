@@ -126,6 +126,8 @@
     object-fit:contain;
 }
   .footnote{font-size:11px;color:#a892a0;margin-top:14px}
+
+  .result .rtext a{color:var(--gold);font-weight:700;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -200,7 +202,7 @@ const CONFIG = {
     },
     40: {
       title:"Premiul cel mare — 40% reducere!",
-      text:"Se aplică pe produsele din colecția X (leggings seamless + seturi premium). Este cea mai mare reducere pe care o oferim. Nu o rata.",
+      text:"Se aplică pe produsele din colecția Vanity . Este cea mai mare reducere pe care o oferim. Nu o rata. <a href='https://www.leggance.ro/cumpara/colanti-vanity-2-0-navy-2903'> VANITYM</a>",
       code:"LEG40"
     }
   },
@@ -286,7 +288,7 @@ function show(value){
   const m=CONFIG.messages[value];
   $('#rPrize').text(value+'%').toggleClass('gold',value===40);
   $('#rTitle').text(m.title);
-  $('#rText').text(m.text);
+  $('#rText').html(m.text);
   // cod MASCAT până confirmă
   $('#rCode').removeClass('revealed').addClass('masked').text('Cod: XXXXX');
   $('#copyBtn').hide();
@@ -337,7 +339,7 @@ function checkExisting(){
   $('.spins,#spinBtn').hide();
   $('#rPrize').text(value+'%').toggleClass('gold',+value===40);
   $('#rTitle').text('Ai câștigat deja');
-  $('#rText').text(m.text);
+  $('#rText').html(m.text);
   $('#rCode').removeClass('masked').addClass('revealed').text('Cod: '+code);
   $('#copyBtn').show().data('code',code);
   $('#chooseControls').hide();
